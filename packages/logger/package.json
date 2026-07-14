@@ -1,0 +1,17 @@
+{
+  "name": "@secure-tunnel/logger",
+  "version": "1.0.2",
+  "description": "Structured logging and performance tracking helpers for Secure Tunnel",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node init && tsup src/index.ts --format cjs,esm --dts --clean"
+  },
+  "dependencies": {
+    "@secure-tunnel/core": "workspace:*"
+  }
+}

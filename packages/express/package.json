@@ -1,0 +1,28 @@
+{
+  "name": "@secure-tunnel/express",
+  "version": "1.0.2",
+  "description": "Express middleware integration for Secure Tunnel transparent gateway",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node init && tsup src/index.ts --format cjs,esm --dts --clean"
+  },
+  "dependencies": {
+    "@secure-tunnel/compression": "workspace:*",
+    "@secure-tunnel/core": "workspace:*",
+    "@secure-tunnel/crypto": "workspace:*",
+    "@secure-tunnel/logger": "workspace:*",
+    "@secure-tunnel/plugins": "workspace:*"
+  },
+  "peerDependencies": {
+    "express": "^4.19.0 || ^5.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "express": "^4.19.2"
+  }
+}

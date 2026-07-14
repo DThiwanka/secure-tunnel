@@ -1,0 +1,18 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "packages/core/src/index.ts",
+    "packages/crypto/src/index.ts",
+    "packages/compression/src/index.ts",
+    "packages/logger/src/index.ts",
+    "packages/plugins/src/index.ts",
+    "packages/express/src/index.ts",
+    "packages/client/src/index.ts"
+  ],
+  "out": "docs/api",
+  "name": "Secure Tunnel (TunnelJS) API Documentation",
+  "includeVersion": true,
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "theme": "default"
+}

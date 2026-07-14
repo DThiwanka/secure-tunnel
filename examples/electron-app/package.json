@@ -1,0 +1,14 @@
+{
+  "name": "example-electron-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Electron integration pattern example for Secure Tunnel (IPC wrapper)",
+  "main": "main.ts",
+  "dependencies": {
+    "electron": "^30.0.6",
+    "@secure-tunnel/client": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

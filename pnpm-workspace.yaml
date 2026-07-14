@@ -1,0 +1,9 @@
+packages:
+  - 'packages/*'
+  - 'examples/*'
+allowBuilds:
+  electron: true
+  esbuild: true
+onlyBuiltDependencies:
+  - esbuild
+  - electron

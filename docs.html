@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Tunnel (TunnelJS) — Developer Documentation Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0b0f19;
+      --bg-card: #111827;
+      --bg-sidebar: #0e1320;
+      --border-color: #1f2937;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --primary: #3b82f6;
+      --primary-glow: rgba(59, 130, 246, 0.15);
+      --accent: #8b5cf6;
+      --accent-glow: rgba(139, 92, 246, 0.15);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --code-bg: #1e293b;
+      --gradient-brand: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      --gradient-glow: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+      --sidebar-width: 280px;
+    }
+
+    [data-theme="light"] {
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-sidebar: #f1f5f9;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --primary: #2563eb;
+      --primary-glow: rgba(37, 99, 235, 0.1);
+      --accent: #7c3aed;
+      --accent-glow: rgba(124, 58, 237, 0.1);
+      --success: #059669;
+      --warning: #d97706;
+      --code-bg: #f8fafc;
+      --gradient-brand: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      --gradient-glow: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    /* Page Layout */
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      z-index: 10;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1.5rem;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: var(--gradient-brand);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    .brand-logo svg {
+      width: 20px;
+      height: 20px;
+      fill: #fff;
+    }
+
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      background: var(--gradient-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .sidebar-item a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-item a:hover {
+      color: var(--text-main);
+      background-color: rgba(255, 255, 255, 0.03);
+    }
+
+    .sidebar-item.active a {
+      color: #fff;
+      background: var(--gradient-brand);
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    .sidebar-item.active a svg {
+      fill: #fff;
+    }
+
+    .sidebar-item svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--text-muted);
+      transition: fill 0.2s ease;
+    }
+
+    .sidebar-item a:hover svg {
+      fill: var(--text-main);
+    }
+
+    .sidebar-footer {
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      flex-grow: 1;
+      padding: 2.5rem 3rem;
+      max-width: 1200px;
+    }
+
+    header {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 3rem;
+      gap: 1rem;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border-color);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--primary);
+      background-color: var(--primary-glow);
+    }
+
+    .theme-toggle svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    /* Content Cards & Sections */
+    section {
+      margin-bottom: 4rem;
+      scroll-margin-top: 2rem;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      background: var(--gradient-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    .section-desc {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      max-width: 800px;
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .badge-primary {
+      background-color: var(--primary-glow);
+      color: var(--primary);
+    }
+
+    .badge-success {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    /* Code Snippets */
+    .code-container {
+      position: relative;
+      margin: 1.5rem 0;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .code-header {
+      background-color: rgba(0, 0, 0, 0.2);
+      padding: 0.5rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      transition: color 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      color: var(--text-main);
+    }
+
+    .copy-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    pre {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      background-color: var(--code-bg);
+      padding: 1.25rem;
+      overflow-x: auto;
+    }
+
+    code {
+      color: #e2e8f0;
+    }
+
+    /* Sandbox Simulator */
+    .sandbox-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .input-group label {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .input-control {
+      background-color: rgba(0,0,0,0.2);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .input-control:focus {
+      border-color: var(--primary);
+    }
+
+    .toggle-group {
+      display: flex;
+      gap: 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .toggle-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      background: var(--gradient-brand);
+      color: #fff;
+      border: none;
+      padding: 0.85rem 1.75rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: box-shadow 0.2s ease;
+      box-shadow: 0 4px 15px var(--primary-glow);
+    }
+
+    .btn:hover {
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+    }
+
+    .live-output-panel {
+      background-color: rgba(0, 0, 0, 0.25);
+      border: 1px dashed var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-height: 400px;
+    }
+
+    .glowing-box {
+      border: 1px solid var(--primary);
+      box-shadow: 0 0 15px var(--primary-glow);
+      background-color: rgba(59, 130, 246, 0.02);
+    }
+
+    .output-tab-container {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1rem;
+      gap: 1rem;
+    }
+
+    .output-tab {
+      padding: 0.5rem 0;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    .output-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .terminal-view {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      background-color: #050b14;
+      border-radius: 6px;
+      padding: 1rem;
+      flex-grow: 1;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      max-height: 450px;
+    }
+
+    /* Alerts */
+    .alert {
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      border-left: 4px solid;
+      margin: 1.5rem 0;
+      font-size: 0.9rem;
+    }
+
+    .alert-info {
+      background-color: rgba(59, 130, 246, 0.08);
+      border-color: var(--primary);
+      color: #93c5fd;
+    }
+
+    .alert-warning {
+      background-color: rgba(245, 158, 11, 0.08);
+      border-color: var(--warning);
+      color: #fde047;
+    }
+
+    @media (max-width: 1024px) {
+      .sandbox-grid {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: none;
+      }
+      .main-content {
+        margin-left: 0;
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+      </div>
+      <span class="brand-name">Secure Tunnel</span>
+    </div>
+
+    <ul class="sidebar-menu">
+      <li class="sidebar-item active" data-target="quickstart"><a href="#quickstart">
+        <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V8h2v4z"/></svg>
+        Quick Start
+      </a></li>
+      <li class="sidebar-item" data-target="express"><a href="#express">
+        <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+        Express Gateway
+      </a></li>
+      <li class="sidebar-item" data-target="client"><a href="#client">
+        <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 4c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 4h16v12H4V4z"/></svg>
+        Client SDK
+      </a></li>
+      <li class="sidebar-item" data-target="react"><a href="#react">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+        React & Axios
+      </a></li>
+      <li class="sidebar-item" data-target="plugins"><a href="#plugins">
+        <svg viewBox="0 0 24 24"><path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5c0-1.1-.9-2-2-2s-2 .9-2 2V5H5c-1.1 0-2 .9-2 2v4H1.5c-1.1 0-2 .9-2 2s.9 2 2 2H3v4c0 1.1.9 2 2 2h4v1.5c0 1.1.9 2 2 2s2-.9 2-2V19h4c1.1 0 2-.9 2-2v-4h1.5c1.1 0 2-.9 2-2s-.9-2-2-2z"/></svg>
+        Custom Plugins
+      </a></li>
+      <li class="sidebar-item" data-target="simulator"><a href="#simulator">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.4z"/></svg>
+        Live Simulator
+      </a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <span style="font-size: 0.8rem; color: var(--text-muted);">v1.0.0 Stable</span>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <main class="main-content">
+    <header>
+      <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+        <svg id="themeIcon" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.999z"/></svg>
+      </button>
+    </header>
+
+    <!-- SECTION: Quick Start -->
+    <section id="quickstart">
+      <h1 class="section-title">Getting Started</h1>
+      <p class="section-desc">
+        Secure Tunnel (<code>TunnelJS</code>) is a transparent application-layer API gateway built for Express and Node.js. It acts as an encryption-first pipeline between clients and backend routers, abstracting endpoints under a single <code>POST /api/gateway</code> layer.
+      </p>
+
+      <div class="alert alert-info">
+        > [!IMPORTANT]
+        > Secure Tunnel is <strong>not</strong> a replacement for HTTPS. It complements transport-layer security with client-server signing, request verification, application payloads compression, and replay attacks prevention.
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Installation</h3>
+        <p style="margin-bottom: 1rem; color: var(--text-muted);">Install the Secure Tunnel components into your Node.js backend and client projects:</p>
+        <div class="code-container">
+          <div class="code-header">
+            <span>Shell</span>
+            <button class="copy-btn" onclick="copyCode(this)">
+              <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code># Install Express Server Package
+npm install @secure-tunnel/core @secure-tunnel/express @secure-tunnel/plugins @secure-tunnel/crypto @secure-tunnel/compression @secure-tunnel/logger
+
+# Install Frontend Client SDK
+npm install @secure-tunnel/core @secure-tunnel/client @secure-tunnel/plugins @secure-tunnel/crypto @secure-tunnel/compression</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: Express Gateway -->
+    <section id="express">
+      <h2 class="section-title">Express Server Setup</h2>
+      <p class="section-desc">
+        Integrate the Secure Tunnel Gateway middleware at the top of your Express application to automatically decrypt, check signatures, log, and forward incoming requests internally.
+      </p>
+
+      <div class="card">
+        <h3 class="card-title">Integration Code Example</h3>
+        <div class="code-container">
+          <div class="code-header">
+            <span>server.ts</span>
+            <button class="copy-btn" onclick="copyCode(this)">
+              <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code>import express from 'express';
+import { createTunnelGateway } from '@secure-tunnel/express';
+
+const app = express();
+
+// The gateway intercepts incoming JSON TunnelEnvelopes
+app.use(express.json());
+
+// Symmetric Keys (Must match clients exactly)
+const secretKey = 'my-super-secret-key-32-chars-long-123456';
+const signatureKey = 'my-signing-hmac-key-32-chars-long-123456';
+
+// Register the Gateway Middleware
+app.use(
+  createTunnelGateway({
+    endpoint: '/api/gateway',
+    secretKey,
+    signatureKey,
+    encryption: true,
+    signing: true,
+    compression: true,
+    replayProtection: true, // Requires Redis/InMemory caching
+  })
+);
+
+// Declare standard internal API endpoints normally!
+// Incoming requests to /api/gateway are transparently routed to these routes.
+app.get('/api/products', (req, res) => {
+  res.json({ products: [{ id: 1, name: 'Secure Device' }] });
+});
+
+app.post('/api/login', (req, res) => {
+  res.json({ token: 'jwt-token-xyz' });
+});
+
+app.listen(3000, () => console.log('Secure Gateway running on port 3000'));</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: Client SDK -->
+    <section id="client">
+      <h2 class="section-title">Client SDK Setup</h2>
+      <p class="section-desc">
+        Configure the SDK client to transparently map outgoing API calls to the gateway endpoint, processing payloads symmetrically.
+      </p>
+
+      <div class="card">
+        <h3 class="card-title">Transparent Request Invocation</h3>
+        <div class="code-container">
+          <div class="code-header">
+            <span>client.ts</span>
+            <button class="copy-btn" onclick="copyCode(this)">
+              <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code>import { createTunnel } from '@secure-tunnel/client';
+
+const client = createTunnel({
+  endpoint: 'http://localhost:3000/api/gateway',
+  secretKey: 'my-super-secret-key-32-chars-long-123456',
+  signatureKey: 'my-signing-hmac-key-32-chars-long-123456',
+  encryption: true,
+  signing: true,
+  compression: true,
+});
+
+async function runDemo() {
+  // Invokes client.request('POST', '/api/login', { ... }) behind the scenes,
+  // packing it into a secure, encrypted Gzip TunnelEnvelope, hits /api/gateway,
+  // and transparently decrypts the response token.
+  const response = await client.post<{ token: string }>('/api/login', {
+    username: 'admin',
+    password: 'password123',
+  });
+
+  console.log('Decrypted API payload token:', response.token);
+}
+
+runDemo();</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: React & Axios -->
+    <section id="react">
+      <h2 class="section-title">React & Axios Adaptations</h2>
+      <p class="section-desc">
+        Apply the transparent tunnel to standard third-party libraries like Axios, or inject client states using React Context.
+      </p>
+
+      <div class="card">
+        <h3 class="card-title">Axios Interceptor Integration</h3>
+        <p style="margin-bottom: 1rem; color: var(--text-muted);">Intercept all outbound requests and response envelopes dynamically using standard interceptor bindings:</p>
+        <div class="code-container">
+          <div class="code-header">
+            <span>axios-setup.ts</span>
+            <button class="copy-btn" onclick="copyCode(this)">
+              <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code>import axios from 'axios';
+import { createTunnel, applyAxiosInterceptor } from '@secure-tunnel/client';
+
+const axiosInstance = axios.create({
+  baseURL: 'http://localhost:3000',
+});
+
+const tunnelClient = createTunnel({
+  endpoint: 'http://localhost:3000/api/gateway',
+  secretKey: 'my-super-secret-key-32-chars-long-123456',
+  signatureKey: 'my-signing-hmac-key-32-chars-long-123456',
+  encryption: true,
+  signing: true,
+  compression: true,
+});
+
+// All calls via axiosInstance will now pass through the tunnel!
+applyAxiosInterceptor(axiosInstance, tunnelClient);
+
+async function testAxios() {
+  // Over-the-wire request is actually POST to /api/gateway!
+  const res = await axiosInstance.get('/api/products');
+  console.log('Products decrypted automatically:', res.data);
+}</code></pre>
+        </div>
+
+        <h3 class="card-title" style="margin-top: 2rem;">React Hook context Provider</h3>
+        <div class="code-container">
+          <div class="code-header">
+            <span>App.tsx</span>
+            <button class="copy-btn" onclick="copyCode(this)">
+              <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code>import React from 'react';
+import { TunnelProvider, useTunnel, createTunnel } from '@secure-tunnel/client';
+
+const client = createTunnel({
+  endpoint: 'http://localhost:3000/api/gateway',
+  secretKey: 'my-super-secret-key-32-chars-long-123456',
+  signatureKey: 'my-signing-hmac-key-32-chars-long-123456',
+});
+
+export default function App() {
+  return (
+    &lt;TunnelProvider client={client}&gt;
+      &lt;Dashboard /&gt;
+    &lt;/TunnelProvider&gt;
+  );
+}
+
+function Dashboard() {
+  const api = useTunnel();
+
+  const fetchItems = async () => {
+    const products = await api.get('/api/products');
+    console.log(products);
+  };
+
+  return &lt;button onClick={fetchItems}&gt;Load Products&lt;/button&gt;;
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: Custom Plugins -->
+    <section id="plugins">
+      <h2 class="section-title">Writing Custom Plugins</h2>
+      <p class="section-desc">
+        Extend the client or gateway processing pipeline by writing custom classes that implement standard event lifecycle hook handlers.
+      </p>
+
+      <div class="card">
+        <h3 class="card-title">Hooks Pipeline Stages</h3>
+        <p style="margin-bottom: 1rem; color: var(--text-muted);">Plugins can intercept, inspect, and modify envelopes or decrypted payloads during stages of the pipeline:</p>
+        <div class="code-container">
+          <div class="code-header">
+            <span>custom-auth-plugin.ts</span>
+            <button class="copy-btn" onclick="copyCode(this)">
+              <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code>import { TunnelPlugin, TunnelRequest, TunnelPluginContext } from '@secure-tunnel/core';
+
+export class DeviceFingerprintPlugin implements TunnelPlugin {
+  public readonly name = 'device-fingerprint';
+
+  // Executed on the client side before packaging
+  public async beforeEncrypt(envelope: any, context: TunnelPluginContext): Promise<void> {
+    // Append telemetry metadata payload header
+    context.state.deviceId = 'macbook-pro-m3-id';
+  }
+
+  // Executed on the server gateway inside the decrypted tunnel state
+  public async beforeForward(request: TunnelRequest, context: TunnelPluginContext): Promise<void> {
+    // Ensure the device id matches acceptable headers list
+    const incomingId = request.headers['x-device-id'];
+    if (!incomingId || incomingId !== 'macbook-pro-m3-id') {
+      throw new Error('Device untrusted');
+    }
+  }
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: Interactive Sandbox Simulator -->
+    <section id="simulator">
+      <h2 class="section-title">Interactive Pipeline Simulator</h2>
+      <p class="section-desc">
+        Type a message, configure encryption/signature options, and click **"Simulate Transmission"** to see what is sent over the network and decrypted by the server.
+      </p>
+
+      <div class="card glowing-box">
+        <div class="sandbox-grid">
+          <!-- Simulator Controls -->
+          <div>
+            <h4 style="margin-bottom: 1.5rem; color: var(--primary);">Client Input Configuration</h4>
+            
+            <div class="input-group">
+              <label for="simUrl">Request Path</label>
+              <input type="text" id="simUrl" class="input-control" value="/api/login">
+            </div>
+
+            <div class="input-group">
+              <label for="simBody">Request Body (JSON format)</label>
+              <textarea id="simBody" class="input-control" style="resize: vertical; min-height: 80px;">{"username": "developer", "action": "test"}</textarea>
+            </div>
+
+            <div class="input-group">
+              <label for="simSecret">Secret Key (32 Chars)</label>
+              <input type="text" id="simSecret" class="input-control" value="my-super-secret-key-32-chars-long-123">
+            </div>
+
+            <div class="input-group">
+              <label for="simSignKey">Signing Key (32 Chars)</label>
+              <input type="text" id="simSignKey" class="input-control" value="my-signing-hmac-key-32-chars-long-123">
+            </div>
+
+            <div class="toggle-group">
+              <label class="toggle-item">
+                <input type="checkbox" id="chkEncrypt" checked> Enable Encryption
+              </label>
+              <label class="toggle-item">
+                <input type="checkbox" id="chkSign" checked> Enable Signature
+              </label>
+              <label class="toggle-item">
+                <input type="checkbox" id="chkCompress"> Enable Compression (Simulated)
+              </label>
+            </div>
+
+            <button class="btn" id="runSimulation">Simulate Transmission</button>
+          </div>
+
+          <!-- Simulator Live Console View -->
+          <div>
+            <div class="output-tab-container">
+              <div class="output-tab active" id="tabWire" onclick="switchOutputTab('wire')">Network Envelope</div>
+              <div class="output-tab" id="tabServer" onclick="switchOutputTab('server')">Server Decryption</div>
+            </div>
+
+            <div class="live-output-panel">
+              <div class="terminal-view" id="simulatorConsole">// Click "Simulate Transmission" to execute cryptographic operations inside the browser.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // Theme Switching Logic
+  const themeToggleBtn = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  let currentTheme = localStorage.getItem('theme') || 'dark';
+
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  updateThemeIcon();
+
+  themeToggleBtn.addEventListener('click', () => {
+    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    localStorage.setItem('theme', currentTheme);
+    updateThemeIcon();
+  });
+
+  function updateThemeIcon() {
+    if (currentTheme === 'light') {
+      themeIcon.innerHTML = `<path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0a.996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0a.996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 0 0 0-1.41a.996.996 0 0 0-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.01a.996.996 0 0 0 0-1.41a.996.996 0 0 0-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>`;
+    } else {
+      themeIcon.innerHTML = `<path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.999z"/>`;
+    }
+  }
+
+  // Copy Code Functionality
+  function copyCode(btn) {
+    const codeBlock = btn.parentElement.nextElementSibling.querySelector('code');
+    navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24" style="fill: var(--success)"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+        Copied!
+      `;
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+      }, 2000);
+    });
+  }
+
+  // Active Menu Tracking on scroll
+  const sections = document.querySelectorAll('section');
+  const navItems = document.querySelectorAll('.sidebar-item');
+
+  window.addEventListener('scroll', () => {
+    let currentActive = '';
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      const sectionHeight = section.clientHeight;
+      if (window.scrollY >= sectionTop - 150) {
+        currentActive = section.getAttribute('id');
+      }
+    });
+
+    navItems.forEach(item => {
+      item.classList.remove('active');
+      if (item.getAttribute('data-target') === currentActive) {
+        item.classList.add('active');
+      }
+    });
+  });
+
+  // Tab switching inside simulator output
+  let activeOutputTab = 'wire';
+  let wireRepresentation = '';
+  let serverDecryptedRepresentation = '';
+
+  function switchOutputTab(tab) {
+    activeOutputTab = tab;
+    document.getElementById('tabWire').classList.remove('active');
+    document.getElementById('tabServer').classList.remove('active');
+
+    if (tab === 'wire') {
+      document.getElementById('tabWire').classList.add('active');
+      document.getElementById('simulatorConsole').innerHTML = wireRepresentation || '// No envelope prepared. Click "Simulate Transmission".';
+    } else {
+      document.getElementById('tabServer').classList.add('active');
+      document.getElementById('simulatorConsole').innerHTML = serverDecryptedRepresentation || '// No decryption completed. Click "Simulate Transmission".';
+    }
+  }
+
+  // Simulation Logic using Browser Web Crypto APIs
+  const simulateBtn = document.getElementById('runSimulation');
+  
+  simulateBtn.addEventListener('click', async () => {
+    const consoleView = document.getElementById('simulatorConsole');
+    consoleView.innerHTML = '⚙️ Running cryptographic pipelines... Generating keys, nonces, and signatures...';
+
+    const url = document.getElementById('simUrl').value;
+    const bodyText = document.getElementById('simBody').value;
+    const secretKeyStr = document.getElementById('simSecret').value;
+    const signKeyStr = document.getElementById('simSignKey').value;
+    
+    const encryptEnabled = document.getElementById('chkEncrypt').checked;
+    const signEnabled = document.getElementById('chkSign').checked;
+    const compressEnabled = document.getElementById('chkCompress').checked;
+
+    let bodyJson = {};
+    try {
+      bodyJson = JSON.parse(bodyText);
+    } catch {
+      consoleView.innerHTML = '❌ Error: Invalid request body JSON format!';
+      return;
+    }
+
+    try {
+      // 1. Prepare Client side raw payload
+      const mockRequest = {
+        method: 'POST',
+        url: url,
+        headers: {
+          'x-client-platform': 'web-browser',
+          'content-type': 'application/json'
+        },
+        body: bodyJson,
+        query: {},
+        params: {},
+        timestamp: Date.now(),
+        nonce: Math.random().toString(36).substring(2, 10),
+        requestId: 'req-' + Math.random().toString(36).substring(2, 12)
+      };
+
+      let finalPayloadStr = JSON.stringify(mockRequest);
+      
+      // Setup envelope metrics
+      let isCompressed = false;
+      let isEncrypted = false;
+      let mockIv = 'N/A';
+      let mockTag = 'N/A';
+      let signature = 'N/A';
+
+      // Broti/Gzip simulation
+      if (compressEnabled) {
+        isCompressed = true;
+        // Mock compress by base64 encoding it and prefixing
+        finalPayloadStr = btoa(unescape(encodeURIComponent(finalPayloadStr)));
+      }
+
+      // AES-GCM simulation using Web Crypto API
+      if (encryptEnabled) {
+        isEncrypted = true;
+        
+        // Derive key from secret key string using SHA-256
+        const enc = new TextEncoder();
+        const keyHash = await window.crypto.subtle.digest('SHA-256', enc.encode(secretKeyStr));
+        const cryptoKey = await window.crypto.subtle.importKey(
+          'raw', 
+          keyHash, 
+          { name: 'AES-GCM' }, 
+          false, 
+          ['encrypt', 'decrypt']
+        );
+
+        // Generate IV
+        const ivBuffer = window.crypto.getRandomValues(new Uint8Array(12));
+        mockIv = Array.from(ivBuffer).map(b => b.toString(16).padStart(2, '0')).join('');
+
+        // Encrypt
+        const encryptedBuffer = await window.crypto.subtle.encrypt(
+          { name: 'AES-GCM', iv: ivBuffer },
+          cryptoKey,
+          enc.encode(finalPayloadStr)
+        );
+
+        // Split ciphertext and tag
+        const encryptedBytes = new Uint8Array(encryptedBuffer);
+        const tagLength = 16;
+        const cipherBytes = encryptedBytes.slice(0, encryptedBytes.length - tagLength);
+        const tagBytes = encryptedBytes.slice(encryptedBytes.length - tagLength);
+
+        const cipherBase64 = btoa(String.fromCharCode.apply(null, Array.from(cipherBytes)));
+        mockTag = btoa(String.fromCharCode.apply(null, Array.from(tagBytes)));
+
+        // Combine as iv:tag:ciphertext
+        finalPayloadStr = `${btoa(String.fromCharCode.apply(null, Array.from(ivBuffer)))}:${mockTag}:${cipherBase64}`;
+      }
+
+      // HMAC-SHA256 Signature calculation
+      if (signEnabled) {
+        const enc = new TextEncoder();
+        const nonceStr = mockRequest.nonce;
+        const timestampStr = mockRequest.timestamp.toString();
+        const reqId = mockRequest.requestId;
+
+        // Canonical string to sign
+        const canonicalString = [
+          finalPayloadStr,
+          timestampStr,
+          nonceStr,
+          reqId
+        ].join(':');
+
+        // HMAC SHA-256
+        const keyData = enc.encode(signKeyStr);
+        const signatureKey = await window.crypto.subtle.importKey(
+          'raw',
+          keyData,
+          { name: 'HMAC', hash: 'SHA-256' },
+          false,
+          ['sign']
+        );
+
+        const sigBuffer = await window.crypto.subtle.sign(
+          'HMAC',
+          signatureKey,
+          enc.encode(canonicalString)
+        );
+
+        signature = btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(sigBuffer))));
+      }
+
+      // Create final TunnelEnvelope
+      const finalEnvelope = {
+        payload: finalPayloadStr,
+        signature: signature !== 'N/A' ? signature : undefined,
+        timestamp: mockRequest.timestamp,
+        nonce: mockRequest.nonce,
+        requestId: mockRequest.requestId,
+        encrypted: isEncrypted,
+        compressed: isCompressed,
+        compressionType: isCompressed ? 'gzip' : undefined,
+        algorithm: isEncrypted ? 'aes-256-gcm' : undefined
+      };
+
+      // Set Network Tab Output
+      wireRepresentation = `<span style="color: var(--success)">// Over the wire POST /api/gateway payload envelope</span>\n` + 
+        JSON.stringify(finalEnvelope, null, 2);
+
+      // 2. Simulate Server Gateway Decrypt & Verify
+      let serverLogs = [];
+      serverLogs.push(`[SYSTEM] Gateway received packet from client.`);
+      serverLogs.push(`[SYSTEM] Request Id: ${finalEnvelope.requestId}`);
+      serverLogs.push(`[SYSTEM] Signature verification checks...`);
+
+      if (signEnabled) {
+        serverLogs.push(`[SUCCESS] HMAC Signature matches envelope parameters.`);
+      } else {
+        serverLogs.push(`[INFO] Signature verification skipped (not enabled).`);
+      }
+
+      serverLogs.push(`[SYSTEM] Decrypting payload using derived secret...`);
+      let decryptedPayload = finalPayloadStr;
+
+      if (encryptEnabled) {
+        const parts = finalPayloadStr.split(':');
+        const ivBytes = new Uint8Array(atob(parts[0]).split('').map(c => c.charCodeAt(0)));
+        const tagBytes = new Uint8Array(atob(parts[1]).split('').map(c => c.charCodeAt(0)));
+        const cipherBytes = new Uint8Array(atob(parts[2]).split('').map(c => c.charCodeAt(0)));
+
+        const combinedBytes = new Uint8Array(cipherBytes.length + tagBytes.length);
+        combinedBytes.set(cipherBytes, 0);
+        combinedBytes.set(tagBytes, cipherBytes.length);
+
+        const enc = new TextEncoder();
+        const keyHash = await window.crypto.subtle.digest('SHA-256', enc.encode(secretKeyStr));
+        const cryptoKey = await window.crypto.subtle.importKey(
+          'raw', 
+          keyHash, 
+          { name: 'AES-GCM' }, 
+          false, 
+          ['encrypt', 'decrypt']
+        );
+
+        const decryptedBuffer = await window.crypto.subtle.decrypt(
+          { name: 'AES-GCM', iv: ivBytes },
+          cryptoKey,
+          combinedBytes
+        );
+
+        const dec = new TextDecoder();
+        decryptedPayload = dec.decode(decryptedBuffer);
+        serverLogs.push(`[SUCCESS] Decryption successful.`);
+      }
+
+      if (compressEnabled) {
+        serverLogs.push(`[SYSTEM] Decompressing gzip data envelope...`);
+        decryptedPayload = decodeURIComponent(escape(atob(decryptedPayload)));
+        serverLogs.push(`[SUCCESS] Decompression successful.`);
+      }
+
+      const reconstructedRequest = JSON.parse(decryptedPayload);
+
+      serverDecryptedRepresentation = `<span style="color: var(--primary)">// Server Internal Decryption logs</span>\n` + 
+        serverLogs.join('\n') + `\n\n` + 
+        `<span style="color: var(--success)">// Reconstructed Express Request forwarded to routing layer:</span>\n` + 
+        JSON.stringify(reconstructedRequest, null, 2);
+
+      // Force view active tab
+      switchOutputTab(activeOutputTab);
+
+    } catch (err) {
+      consoleView.innerHTML = `❌ Cryptographic Simulation Failed!\nDetails: ${err.message}\nMake sure your keys match correctly and input keys are 32 chars.`;
+    }
+  });
+
+</script>
+</body>
+</html>
